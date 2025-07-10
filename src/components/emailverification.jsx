@@ -19,6 +19,7 @@ export function OtpInput({handleContinue, email, disabled, setdisabled}){
         </div>
         <div className='space-y-8'>
           <OtpInputBox
+            otpLength={6}
             disabled={disabled}
             setdisabled={setdisabled}
           />

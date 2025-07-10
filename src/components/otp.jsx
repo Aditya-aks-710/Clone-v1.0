@@ -1,17 +1,16 @@
 
-import { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import timeimg from "../assets/time.png"
 
-export function OtpInputBox({disabled, setdisabled}){
-    const ref1 = useRef();
-    const ref2 = useRef();
-    const ref3 = useRef();
-    const ref4 = useRef();
-    const ref5 = useRef();
-    const ref6 = useRef();
+export function OtpInputBox({otpLength, disabled, setdisabled}){
+    const inputRefs = useRef([]);
 
     const [timeLeft, settimeLeft] = useState(600);
-    const [timeover, settimeover] = useState(false); 
+    const [timeover, settimeover] = useState(false);
+    
+    useEffect(() => {
+        inputRefs.current = Array.from({length: otpLength}, () => React.createRef());
+    }, [otpLength]);
 
     useEffect(() => {
         setdisabled(true);
@@ -37,70 +36,26 @@ export function OtpInputBox({disabled, setdisabled}){
     return (
         <>
         <div className="flex justify-center flex-row space-x-2 mb-3">
-            <SubOtpBox
-                reference={ref1} 
-                onDone={() => {
-                    ref2.current.focus();
-                }}
-                onBack={() => {}}
-                disabled={disabled}
-                setdisabled={setdisabled}
-            />
-            <SubOtpBox
-                reference={ref2} 
-                onDone={() => {
-                    ref3.current.focus();
-                }}
-                onBack={() => {
-                    ref1.current.focus();
-                }}
-                disabled={disabled}
-                setdisabled={setdisabled}
-            />
-            <SubOtpBox 
-                reference={ref3} 
-                onDone={() => {
-                    ref4.current.focus();
-                }}
-                onBack={() => {
-                    ref2.current.focus();
-                }}
-                disabled={disabled}
-                setdisabled={setdisabled}
-            />
-            <SubOtpBox 
-                reference={ref4} 
-                onDone={() => {
-                    ref5.current.focus();
-                }}
-                onBack={() => {
-                    ref3.current.focus();
-                }}
-                disabled={disabled}
-                setdisabled={setdisabled}
-            />
-            <SubOtpBox
-                reference={ref5} 
-                onDone={() => {
-                    ref6.current.focus();
-                }}
-                onBack={() => {
-                    ref4.current.focus();
-                }}
-                disabled={disabled}
-                setdisabled={setdisabled}
-            />
-            <SubOtpBox
-                reference={ref6} 
-                onDone={() => {
-                    setdisabled(false);
-                }}
-                onBack={() => {
-                    ref5.current.focus();
-                }}
-                disabled={disabled}
-                setdisabled={setdisabled}
-            />
+            {Array.from({length: otpLength}, (_, i) => (
+                <SubOtpBox
+                    key={i}
+                    reference={inputRefs.current[i]}
+                    onDone={() => {
+                        if(i < otpLength - 1) {
+                            inputRefs.current[i+1].current.focus();
+                        } else {
+                            setdisabled(false);
+                        }
+                    }}
+                    onBack={() => {
+                        if(i > 0) {
+                            inputRefs.current[i-1].current.focus();
+                        }
+                    }}
+                    disabled={disabled}
+                    setdisabled={setdisabled}
+                />
+            ))}
         </div>
         {!timeover && (
             <div className='text-[#6382a5] text-sm flex gap-1 items-center justify-center'>
@@ -114,7 +69,7 @@ export function OtpInputBox({disabled, setdisabled}){
                     settimeover(false);
                     settimeLeft(600);
                 }}
-                className="bg-[#3cdbc9] text-white p-1  rounded">
+                className="bg-[#3cdbc9] text-white p-1 rounded">
                     Resend
                 </button>
             </div>
