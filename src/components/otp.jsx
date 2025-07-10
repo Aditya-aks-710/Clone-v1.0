@@ -7,16 +7,23 @@ export function OtpInputBox({otpLength, disabled, setdisabled}){
 
     const [timeLeft, settimeLeft] = useState(600);
     const [timeover, settimeover] = useState(false);
+    const [otpvalue, setotpvalue] = useState([]);
     
     useEffect(() => {
+        const isComplete = otpvalue.every(val => val !== "");
+        setdisabled(!isComplete);
+    }, [otpvalue]);
+
+    useEffect(() => {
         inputRefs.current = Array.from({length: otpLength}, () => React.createRef());
+        setotpvalue(Array(otpLength).fill(""));
     }, [otpLength]);
 
     useEffect(() => {
         setdisabled(true);
         const timer = setInterval(() => {
         settimeLeft((prev) => {
-            if(prev <= 1){
+            if(prev === 1){
             clearInterval(timer);
             settimeover(true);
             return 0;
@@ -33,6 +40,12 @@ export function OtpInputBox({otpLength, disabled, setdisabled}){
         return `${min}:${sec}`;
     }
 
+    function handleotpChange(ind, val){
+        const updated = [...otpvalue];
+        updated[ind] = val;
+        setotpvalue(updated);
+    }
+
     return (
         <>
         <div className="flex justify-center flex-row space-x-2 mb-3">
@@ -40,11 +53,11 @@ export function OtpInputBox({otpLength, disabled, setdisabled}){
                 <SubOtpBox
                     key={i}
                     reference={inputRefs.current[i]}
+                    value={otpvalue[i] || ""}
+                    setValue={(val) => handleotpChange(i, val)}
                     onDone={() => {
                         if(i < otpLength - 1) {
                             inputRefs.current[i+1].current.focus();
-                        } else {
-                            setdisabled(false);
                         }
                     }}
                     onBack={() => {
@@ -68,8 +81,10 @@ export function OtpInputBox({otpLength, disabled, setdisabled}){
                 onClick={() => {
                     settimeover(false);
                     settimeLeft(600);
+                    setotpvalue(Array(otpLength).fill(""));
+                    inputRefs.current[0]?.current?.focus();
                 }}
-                className="bg-[#3cdbc9] text-white p-1 rounded">
+                className="bg-[#3cdbc9] text-white p-1 rounded cursor-pointer">
                     Resend
                 </button>
             </div>
@@ -80,12 +95,14 @@ export function OtpInputBox({otpLength, disabled, setdisabled}){
 
 function SubOtpBox({
     reference,
+    value,
+    setValue,
     onDone,
     onBack,
     disabled,
     setdisabled
 }){
-    const [value, setValue] = useState("");
+    // const [value, setValue] = useState("");
 
     function validator(e){
         const newValue = e.target.value;
