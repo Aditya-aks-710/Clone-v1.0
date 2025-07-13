@@ -7,6 +7,7 @@ import { InputBox } from './components/input'
 import { EmailInput } from './components/email'
 import { DobInput } from './components/birthyear'
 import { OtpInput } from './components/emailverification'
+import { LastPage } from './components/lastpage'
 
 
 function App() {
@@ -22,10 +23,14 @@ function App() {
     else if(step === 2){
       setstep(3);
     }
+    else if(step === 3){
+      setstep(4);
+    }
   }
 
   return (
     <>
+    <div className='bg-[#00274e]'>
       {step === 1 && (
         <EmailInput
           handleContinue={handleContinue} 
@@ -53,6 +58,10 @@ function App() {
           disabled={disabled}
           setdisabled={setdisabled}
         />
+      )}
+      </div>
+      {step === 4 && (
+        <LastPage/>
       )}
     </>
   )
